@@ -19,42 +19,42 @@ def scoreQualy(qualy_result, full_qualy_results, drivers, constructors):
     qualy_pos = int(qualy_result["position"])
     # Progressed to Q3 = 3 pts
     if "Q3" in qualy_result:
-        drivers[driver_code]["score"] += 3
-        constructors[constructorId]["score"] += 3
+        drivers[driver_code].score += 3
+        constructors[constructorId].score += 3
     # Progressed to Q2 but did not progress to Q3 = 2 pts
     elif "Q2" in qualy_result:
-        drivers[driver_code]["score"] += 2
-        constructors[constructorId]["score"] += 2
+        drivers[driver_code].score += 2
+        constructors[constructorId].score += 2
     # Did not progress to Q2 = 1pt
     elif "Q1" in qualy_result:
-        drivers[driver_code]["score"] += 1
-        constructors[constructorId]["score"] += 1
+        drivers[driver_code].score += 1
+        constructors[constructorId].score += 1
     # Did not qualify = -5 pts (driver only)
     else:
-        drivers[driver_code]["score"] += -5
+        drivers[driver_code].score += -5
     # Qualified ahead of team mate = 2 pts (driver only) 
     if beatTeamMate(constructorId, qualy_pos, full_qualy_results):
-        drivers[driver_code]["score"] += 2
+        drivers[driver_code].score += 2
     # Qualifying Position Bonuses
     qualy_position_bonus = max(11 - qualy_pos, 0)
-    drivers[driver_code]["score"] += qualy_position_bonus
-    constructors[constructorId]["score"] += qualy_position_bonus
+    drivers[driver_code].score += qualy_position_bonus
+    constructors[constructorId].score += qualy_position_bonus
     # Streak Counter
     if qualy_pos <= 10:
-        drivers[driver_code]["qualy_streak"] += 1
+        drivers[driver_code].qualy_streak += 1
         if teamMateInTopTen(constructorId, qualy_pos, full_qualy_results):
-            constructors[constructorId]["qualy_streak"] += 0.5  # When we see the team mate, we will increment this again
+            constructors[constructorId].qualy_streak += 0.5  # When we see the team mate, we will increment this again
         # Driver Qualifying - driver qualifies in Top 10 for 5 races in a row = 5 pts
-        if drivers[driver_code]["qualy_streak"] == 5:
-            drivers[driver_code]["qualy_streak"] = 0  # Reset
-            drivers[driver_code]["score"] += 5
+        if drivers[driver_code].qualy_streak == 5:
+            drivers[driver_code].qualy_streak = 0  # Reset
+            drivers[driver_code].score += 5
         # Constructor Qualifying - both drivers qualify in Top 10 for 3 races in a row = 5 pts
-        if constructors[constructorId]["qualy_streak"]  == 3:
-            constructors[constructorId]["qualy_streak"] = 0  # Reset
-            constructors[constructorId]["score"] += 5
+        if constructors[constructorId].qualy_streak  == 3:
+            constructors[constructorId].qualy_streak = 0  # Reset
+            constructors[constructorId].score += 5
     else:
-        drivers[driver_code]["qualy_streak"] = 0  # Reset
-        constructors[constructorId]["qualy_streak"] = 0  # Reset
+        drivers[driver_code].qualy_streak = 0  # Reset
+        constructors[constructorId].qualy_streak = 0  # Reset
     return
 
 def scoreRace(result, full_results, drivers, constructors):
@@ -66,57 +66,57 @@ def scoreRace(result, full_results, drivers, constructors):
         # Finished Race = 1 pt
         final_pos = int(final_pos)
         if final_pos > 0:
-            drivers[driver_code]["score"] += 1
-            constructors[constructorId]["score"] += 1
+            drivers[driver_code].score += 1
+            constructors[constructorId].score += 1
             # Fastest lap = 5 pts (driver only)
             if result["FastestLap"]["rank"] == "1":
-                drivers[driver_code]["score"] += 5
+                drivers[driver_code].score += 5
             # Finished ahead of team mate = 3 pts (driver only)
             if beatTeamMate(constructorId, final_pos, full_results):
-                drivers[driver_code]["score"] += 3
+                drivers[driver_code].score += 3
             # Finished race, position gained = +2 pts per place gained (max +10 pts)
             if grid_pos > final_pos:
                 pos_gained_bonus = min(10, 2*(grid_pos - final_pos))
-                drivers[driver_code]["score"] += pos_gained_bonus
-                constructors[constructorId]["score"] += pos_gained_bonus
+                drivers[driver_code].score += pos_gained_bonus
+                constructors[constructorId].score += pos_gained_bonus
             # Started race within Top 10, finished race but lost position = -2 pts per place lost (max -10 pts)
             else:
                 if grid_pos <= 10:
                     lost_pos_penalty = max(-10, -2*(final_pos - grid_pos))
-                    drivers[driver_code]["score"] += lost_pos_penalty
-                    constructors[constructorId]["score"] += lost_pos_penalty
+                    drivers[driver_code].score += lost_pos_penalty
+                    constructors[constructorId].score += lost_pos_penalty
             # Started race outside Top 10, finished race but lost position = -1 pt per place lost (max -5 pts)
                 else:
                     lost_pos_penalty = max(-5, -1*(final_pos - grid_pos))
-                    drivers[driver_code]["score"] += lost_pos_penalty
-                    constructors[constructorId]["score"] += lost_pos_penalty
+                    drivers[driver_code].score += lost_pos_penalty
+                    constructors[constructorId].score += lost_pos_penalty
             # Finishing Position Bonuses
             race_pos_bonus = racePositionBonus(int(final_pos))
-            drivers[driver_code]["score"] += race_pos_bonus
-            constructors[constructorId]["score"] += race_pos_bonus 
+            drivers[driver_code].score += race_pos_bonus
+            constructors[constructorId].score += race_pos_bonus 
     else:
         # Disqualification from race = -20 pts (driver only)
         if final_pos == "D":
-            drivers[driver_code]["score"] += -20
+            drivers[driver_code].score += -20
         else:
             # Not classifed = -15 pts (driver only)
-            drivers[driver_code]["score"] += -15
+            drivers[driver_code].score += -15
     # Streak Counter
     if final_pos <= 10:
-        drivers[driver_code]["race_streak"] += 1
+        drivers[driver_code].race_streak += 1
         if teamMateInTopTen(constructorId, final_pos, full_results):
-            constructors[constructorId]["race_streak"] += 0.5  # When we see the team mate, we will increment this again
+            constructors[constructorId].race_streak += 0.5  # When we see the team mate, we will increment this again
         # Driver Race - driver finishes race in Top 10 for 5 races in a row = 10 pts
-        if drivers[driver_code]["race_streak"] == 5:
-            drivers[driver_code]["race_streak"] = 0  # Reset
-            drivers[driver_code]["score"] += 10
+        if drivers[driver_code].race_streak == 5:
+            drivers[driver_code].race_streak = 0  # Reset
+            drivers[driver_code].score += 10
         # Constructor Race - both drivers finish race in Top 10 for 3 races in a row = 10 pts
-        if constructors[constructorId]["race_streak"]  == 3:
-            constructors[constructorId]["race_streak"] = 0  # Reset
-            constructors[constructorId]["score"] += 10
+        if constructors[constructorId].race_streak  == 3:
+            constructors[constructorId].race_streak = 0  # Reset
+            constructors[constructorId].score += 10
     else:
-        drivers[driver_code]["race_streak"] = 0  # Reset
-        constructors[constructorId]["race_streak"] = 0  # Reset
+        drivers[driver_code].race_streak = 0  # Reset
+        constructors[constructorId].race_streak = 0  # Reset
     return
 
 def racePositionBonus(race_position):
